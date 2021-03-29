@@ -86,21 +86,22 @@
 <body>
 	<div id="header" class="wrap">
 		<div class="help">
-			<c:if test="${name!=null}">
-				<a href="selectdd?dd=${name.EU_USER_ID }">个人订单</a>
-			</c:if>
-			<c:if test="${name!=null}">当前用户${name.EU_USER_ID }</c:if>
-			<a href="ShopSelect" class="shopping">购物车</a>
-			<c:if test="${name==null}">
-				<a href="login.jsp">登录</a>|<a href="register.jsp">注册</a>
-			</c:if>
-			<c:if test="${name!=null}">
-				<a href="zx">退出</a>
-			</c:if>
-			<a href="SelallServlet">留言</a>
-			<c:if test="${name.EU_STATUS==2}">
-				<a href="manage/index.jsp">去后台</a>
-			</c:if>
+		    {{if .name}}
+		        <a href="selectdd?dd={{.name.Id}}">个人订单</a>
+		        当前用户{{.name.Id}}
+		    {{end}}
+		        <a href="ShopSelect" class="shopping">购物车</a>
+		    {{if .name}}
+		        <a href="zx">退出</a>
+		    {{else}}
+		        <a href="loginPage">登录</a>|<a href="register.jsp">注册</a>
+		    {{end}}
+		        <a href="SelallServlet">留言</a>
+		    {{if .name}}
+		    {{if eq .name.Status 2}}
+		        <a href="manage/index.jsp">去后台</a>
+		    {{end}}
+		    {{end}}
 		</div>
 		<a href="indexSelect"><button>首页</button></a>
 	</div>
@@ -120,7 +121,7 @@
 				<li><a href="javascript:searchHot('牛奶')">牛奶</a></li>
 				<li><a href="javascript:searchHot('特产')">特产</a></li>
 				<li class="last"><input type="text" id="selectname"
-					value="${search_words}" /><a href="javascript:selectname()">搜索</a></li>
+					value="{{.search_words}}" /><a href="javascript:selectname()">搜索</a></li>
 			</ul>
 		</div>
 	</div>
@@ -132,36 +133,34 @@
 					<dt>
 						<a href="selectProductList">全部商品</a>
 					</dt>
-					{{range $i, $f := .flist}}
+					{{range .flist}}
 					    <dt>
-					        <a href="selectProductList?fid={{$f.Id}}">{{$f.Name}}</a>
+					        <a href="selectProductList?fid={{.Id}}">{{.Name}}</a>
 					    </dt>
-					    {{range $j, $c := .clist}}
-					        {{if eq $f.CategoryId $c.ParentId}}
-					            {{if ne .p.CategoryChildId $c.Id}}
-					                <dd>
-					                    <a href="selectProductList?cid={{$c.Id}}">{{$c.Name}}</a>
-					                </dd>
-					            {{end}}
-					        {{end}}
-					    {{end}}
+                        {{$fatherCid := .Id}}
+                        {{range $.clist}}
+                        {{if eq $fatherCid .ParentId}}
+                            <dd>
+                                <a href="selectProductList?cid={{.Id}}">{{.Name}}</a>
+                            </dd>
+                        {{end}}
+                        {{end}}
 					{{end}}
-
 				</dl>
 			</div>
 			<div class="spacer"></div>
 			<div class="last-view">
 				<h2>最近浏览</h2>
 				<dl class="clearfix">
-					<c:forEach var="lastp" items="${lastlylist}">
-						<dt>
-							<a href="selectProductView?id=${lastp.EP_ID }"><img
-								height="40" src="images/product/${lastp.EP_FILE_NAME }" /></a>
-						</dt>
-						<dd>
-							<a href="selectProductView?id=${lastp.EP_ID }">${lastp.EP_NAME }</a>
-						</dd>
-					</c:forEach>
+				    {{range .lastlylist}}
+				        <dt>
+				            <a href="selectProductView?id={{.Id }}"><img
+                        		height="40" src="images/product/{{.FileName }}" /></a>
+				        </dt>
+				        <dd>
+                        	<a href="selectProductView?id={{.Id}}">{{.Name}}</a>
+                        </dd>
+				    {{end}}
 				</dl>
 			</div>
 		</div>
@@ -172,10 +171,10 @@
 				<div id="scroll_div" class="scroll_div" style="width: 770px;">
 					<div id="scroll_begin">
 						<ul>
-							<c:forEach var="tp" items="${tlist}">
-								<li><a href="selectProductView?id=${tp.EP_ID }"><img
-										src="images/product/${tp.EP_FILE_NAME }" /></a></li>
-							</c:forEach>
+						    {{range .tlist}}
+                                <li><a href="selectProductView?id={{.Id}}"><img
+                                        src="images/product/{{.FileName }}" /></a></li>
+						    {{end}}
 						</ul>
 					</div>
 					<div id="scroll_end"></div>
@@ -190,20 +189,20 @@
 			<div class="price-off">
 				<h2>今日特价</h2>
 				<ul class="product clearfix">
-					<c:forEach var="tp" items="${tlist}">
+				    {{range .tlist}}
 						<li>
 							<dl>
 								<dt>
-									<a href="selectProductView?id=${tp.EP_ID }" target="_blank"><img
-										src="images/product/${tp.EP_FILE_NAME }" /></a>
+									<a href="selectProductView?id={{.Id}}" ><img
+										src="images/product/{{.FileName }}" /></a>
 								</dt>
 								<dd class="title">
-									<a href="selectProductView?id=${tp.EP_ID }" target="_blank">${tp.EP_DESCRIPTION }</a>
+									<a href="selectProductView?id={{.Id}}" >{{.Description}}</a>
 								</dd>
-								<dd class="price">${tp.EP_PRICE }.00</dd>
+								<dd class="price">{{.Price}}.00</dd>
 							</dl>
 						</li>
-					</c:forEach>
+				    {{end}}
 				</ul>
 			</div>
 <!-- 			<div class="side">
@@ -215,20 +214,20 @@
 			<div class="hot">
 				<h2>热卖推荐</h2>
 				<ul class="product clearfix">
-					<c:forEach var="hotp" items="${hlist}">
+				    {{range .hlist}}
 						<li>
 							<dl>
 								<dt>
-									<a href="selectProductView?id=${hotp.EP_ID }" target="_blank"><img
-										src="images/product/${hotp.EP_FILE_NAME }" /></a>
+									<a href="selectProductView?id={{.Id}}" ><img
+										src="images/product/{{.FileName }}" /></a>
 								</dt>
 								<dd class="title">
-									<a href="selectProductView?id=${hotp.EP_ID }" target="_blank">${hotp.EP_DESCRIPTION}</a>
+									<a href="selectProductView?id={{.Id}}" >{{.Description}}</a>
 								</dd>
-								<dd class="price">${hotp.EP_PRICE }.00</dd>
+								<dd class="price">{{.Price}}.00</dd>
 							</dl>
 						</li>
-					</c:forEach>
+				    {{end}}
 				</ul>
 			</div>
 		</div>
