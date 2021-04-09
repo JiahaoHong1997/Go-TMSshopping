@@ -14,14 +14,6 @@
 		location.href = 'selectProductList?name=' + name;
 	}
 </script>
-
-<style>
-body{
-	 background-size:100% 100%;
-	 background-image:url(./images/tms.jpg)/*  no-repeat center top */;
-}
-</style>
-
 </head>
 <body>
 	{{template "header" .name}}
@@ -45,35 +37,20 @@ body{
 			</ul>
 		</div>
 	</div>
-	<div style="margin: 12% 0 0 18%;" id="register" class="wrap">
+	<div id="register" class="wrap">
 		<div class="shadow">
 			<em class="corner lb"></em> <em class="corner rt"></em>
 			<div class="box">
-				<h1>欢迎登陆-托马斯网上零食商城</h1>
-				<form id="loginForm" method="post" action="login"
-					onsubmit="return checkForm(this)">
-					<table>
-						<tr>
-							<td class="field">用户名：</td>
-							<td><input class="text" type="text" name="userName"
-								onfocus="FocusItem(this)" onblur="CheckItem(this);" /><span></span></td>
-						</tr>
-						<tr>
-							<td class="field">登录密码：</td>
-							<td><input class="text" type="password" id="passWord"
-								name="passWord" onfocus="FocusItem(this)"
-								onblur="CheckItem(this);" /><span></span></td>
-						</tr>
-						<tr>
-							<td></td>
-							<td><label class="ui-green"><input type="submit"
-									name="submit" id="sub" value="立即登录" /></label></td>
-						</tr>
-					</table>
-				</form>
+				<h1>欢迎注册-托马斯网上零食商城</h1>
+				<div class="msg">
+					<p>恭喜：注册成功！</p>
+					<p>正在进入首页...</p>
+					<script type="text/javascript">
+						setTimeout("location.href='indexSelect'", 3000);
+					</script>
+				</div>
 			</div>
 		</div>
-		<div class="clear"></div>
 	</div>
 </body>
 </html>

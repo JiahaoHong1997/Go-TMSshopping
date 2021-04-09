@@ -5,11 +5,13 @@
 <title>商城-首页</title>
 <link type="text/css" rel="stylesheet" href="css/style.css" />
 <script type="text/javascript" src="scripts/function.js"></script>
+<script type="text/javascript" src="scripts/calendar.js"></script>
 <script type="text/javascript">
 	function selectname() {
 		var name = document.getElementById("selectname").value;
 		location.href = 'selectProductList?name=' + name;
 	}
+
 	function searchHot(name) {
 		location.href = 'selectProductList?name=' + name;
 	}
@@ -45,29 +47,61 @@ body{
 			</ul>
 		</div>
 	</div>
-	<div style="margin: 12% 0 0 18%;" id="register" class="wrap">
+	<div id="register" class="wrap">
 		<div class="shadow">
 			<em class="corner lb"></em> <em class="corner rt"></em>
 			<div class="box">
-				<h1>欢迎登陆-托马斯网上零食商城</h1>
-				<form id="loginForm" method="post" action="login"
-					onsubmit="return checkForm(this)">
+				<h1>欢迎注册-托马斯网上零食商城</h1>
+				<form id="regForm" method="post" action="register"
+					onsubmit="return checkForm(this);">
 					<table>
 						<tr>
 							<td class="field">用户名：</td>
 							<td><input class="text" type="text" name="userName"
-								onfocus="FocusItem(this)" onblur="CheckItem(this);" /><span></span></td>
+								onfocus="FocusItem(this)"
+								onblur="CheckItem(this),check(this.value);" placeholder="请填写用户名"/><span id="sp"></span></td>
+						</tr>
+						<tr>
+							<td class="field">用户类型：</td>
+							<td><input style="border: 0px;outline:none;" type="text" class="text" name="name" value="普通用户" readonly="readonly"/></td>
 						</tr>
 						<tr>
 							<td class="field">登录密码：</td>
 							<td><input class="text" type="password" id="passWord"
 								name="passWord" onfocus="FocusItem(this)"
-								onblur="CheckItem(this);" /><span></span></td>
+								onblur="CheckItem(this);" placeholder="请填写登录密码"/><span></span></td>
+						</tr>
+						<tr>
+							<td class="field">确认密码：</td>
+							<td><input class="text" type="password" name="rePassWord"
+								onfocus="FocusItem(this)" onblur="CheckItem(this);" placeholder="请确认密码"/><span></span></td>
+						</tr>
+						<tr>
+							<td class="field">性别：</td>
+							<td><input type="radio" name="sex" value="男"
+								checked="checked" />男 <input type="radio" name="sex" value="女" />女</td>
+						</tr>
+						<tr>
+							<td class="field">出生日期：</td>
+							<td><input type="text" name="birthday"
+								onfocus="c.showMoreDay = false;c.show(this);" placeholder="请选择出生日期"/></td>
+						</tr>
+						<tr>
+							<td class="field">邮箱：</td>
+							<td><input type="text" class="text" name="email" value="" placeholder="请填写正确的邮箱地址"/></td>
+						</tr>
+						<tr>
+							<td class="field">手机号码：</td>
+							<td><input type="text" class="text" name="mobile" value="" placeholder="请填写11位手机号"/></td>
+						</tr>
+						<tr>
+							<td class="field">送货地址：</td>
+							<td><input type="text" class="text" name="address" value="" placeholder="请填写正确的送货地址"/></td>
 						</tr>
 						<tr>
 							<td></td>
 							<td><label class="ui-green"><input type="submit"
-									name="submit" id="sub" value="立即登录" /></label></td>
+									name="submit" disabled=true id="sub" value="提交注册" /></label></td>
 						</tr>
 					</table>
 				</form>

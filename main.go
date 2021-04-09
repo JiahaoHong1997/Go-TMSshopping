@@ -5,30 +5,32 @@ import (
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	ginsession "github.com/go-session/gin-session"
-	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"html/template"
 	"net/http"
 	"os"
 	"tmsshopping/controller"
+	"tmsshopping/controller/manage"
+	"tmsshopping/controller/shop"
 	"tmsshopping/db"
+	"tmsshopping/log"
 )
 
-func Logger() *logrus.Logger {
-	//实例化
-	logger := logrus.New()
-	logger.Out = os.Stdout
-
-	//设置日志级别
-	logger.SetLevel(logrus.DebugLevel)
-
-	//设置日志格式
-	logger.SetFormatter(&logrus.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
-	return logger
-}
+//func Logger() *logrus.Logger {
+//	//实例化
+//	logger := logrus.New()
+//	logger.Out = os.Stdout
+//
+//	//设置日志级别
+//	logger.SetLevel(logrus.DebugLevel)
+//
+//	//设置日志格式
+//	logger.SetFormatter(&logrus.TextFormatter{
+//		TimestampFormat: "2006-01-02 15:04:05",
+//	})
+//	return logger
+//}
 
 func add(x, y int) int {
 	return x + y
@@ -47,16 +49,21 @@ func main() {
 	if !exist {
 		mysqlAddr = "127.0.0.1"
 	}
+	database, exist := os.LookupEnv("DB")
+	if !exist {
+		database = "fzw"
+	}
 
 	// +--------------+ site config
-	Logger().Infoln("Welcome to TMS shopping application")
+	// [2] db
+	log.Log.Infoln("Welcome to TMS shopping application")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/tms?charset=utf8&parseTime=True&loc=Local", mysqlu, mysqlp, mysqlAddr)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", mysqlu, mysqlp, mysqlAddr, database)
 	dbconn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("db conn fail.")
 	} else {
-		Logger().Infoln("database connect success.")
+		log.Log.Debugln("database connect success.")
 		db.DB = dbconn
 	}
 
@@ -74,16 +81,52 @@ func main() {
 	router.Static("/images", "./static/images")
 	router.Static("/scripts", "./static/scripts")
 	// +--------------+ 静态页面渲染
-	router.GET("/index", func(context *gin.Context) {
-		context.HTML(http.StatusOK, "index.tmpl", gin.H{})
+	router.GET("/test", func(context *gin.Context) {
+		log.Log.WithField("test", "test").Info("测试文本")
+		log.Log.WithField("warn", "warn").Warn("警告文本")
+		log.Log.WithField("debug", "debug").Debug("警告文本")
+		log.Log.WithField("error", "error").Error("错误文本")
 	})
 	router.GET("/loginPage", func(context *gin.Context) {
 		context.HTML(http.StatusOK, "login.tmpl", gin.H{})
 	})
+	router.GET("/registerPage", func(context *gin.Context) {
+		context.HTML(http.StatusOK, "register.tmpl", gin.H{})
+	})
+	router.GET("/registerResultPage", func(context *gin.Context) {
+		context.HTML(http.StatusOK, "reg-result.tmpl", gin.H{})
+	})
 	// +--------------+ http请求
-	router.GET("/indexSelect", controller.IndexSelect)
-	router.GET("/selectProductList", controller.SelectProductList)
-	router.GET("/selectProductView", controller.SelectProductView)
-	router.POST("/login", controller.Login)
+	router.GET("/", controller.IndexSelect)
+	router.GET("/index", controller.IndexSelect)
+	router.GET("/indexSelect", controller.IndexSelect)             //首页
+	router.GET("/selectProductList", controller.SelectProductList) // 商品列表
+	router.GET("/selectProductView", controller.SelectProductView) // 商品详情页
+	router.GET("/zx", controller.Logout)                           // 用户登出
+	router.GET("/SelallServlet", controller.MessageBoard)          // 留言
+	router.GET("/usernamecheck", controller.UsernameCheck)         // 注册用户时验证用户名
+	router.GET("/ShopSelect", shopController.ShopSelect)           // 购物车
+	router.GET("/shopAdd", shopController.ShopBuy)                 // 购买商品按钮
+	router.GET("/shopAdd2", shopController.ShopAdd)                // 放入购物车
+	router.GET("/selectdd", controller.SelectOrder)                // 个人订单
+	router.GET("/UpdateServlet", shopController.ShopUpdate)        // 购物车购买数量更新
+	router.GET("/gmServlet", shopController.ShopCartSettle)        // 购物车结算
+	router.POST("/login", controller.Login)                        // 登录
+	router.POST("/GueServlet", controller.PostComment)             // 提交留言
+	router.POST("/register", controller.Register)                  // 注册
+
+	// +--------------+ manage part
+	m := router.Group("/manage")
+	m.GET("/index", manage.Index)
+	m.GET("/userAddPage", manage.UserAddPage)
+	m.GET("/useradd", manage.UserAdd)
+	m.GET("/user", manage.UserManagePage)
+	m.GET("/userdel", manage.UserDelete)
+	m.GET("/userUpdatePage", manage.UserUpdatePage)
+	m.GET("/userupdate", manage.UserUpdate)
+	m.GET("/productClass", manage.ProductClassManagePage)
+	m.GET("/productClassAdd", manage.ProductClassAddPage)
+	m.GET("/doProductClassAdd", manage.ProductClassAdd)
+
 	_ = endless.ListenAndServe(":8888", router)
 }

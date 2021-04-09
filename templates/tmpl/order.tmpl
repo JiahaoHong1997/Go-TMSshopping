@@ -5,12 +5,28 @@
 <title>商城-首页</title>
 <link type="text/css" rel="stylesheet" href="css/style.css" />
 <script type="text/javascript" src="scripts/function.js"></script>
-<script type="text/javascript">
-	function jump(p) {
-		location.href = 'selectProductList?cp=' + p;
+
+<script language="javascript">
+	function ScrollImgLeft() {
+		var speed = 20
+		var scroll_begin = document.getElementById("scroll_begin");
+		var scroll_end = document.getElementById("scroll_end");
+		var scroll_div = document.getElementById("scroll_div");
+		scroll_end.innerHTML = scroll_begin.innerHTML
+		function Marquee() {
+			if (scroll_end.offsetWidth - scroll_div.scrollLeft <= 0)
+				scroll_div.scrollLeft -= scroll_begin.offsetWidth
+			else
+				scroll_div.scrollLeft++
+		}
+		var MyMar = setInterval(Marquee, speed)
+		scroll_div.onmouseover = function() {
+			clearInterval(MyMar)
+		}
+		scroll_div.onmouseout = function() {
+			MyMar = setInterval(Marquee, speed)
+		}
 	}
-</script>
-<script type="text/javascript">
 	function selectname() {
 		var name = document.getElementById("selectname").value;
 		location.href = 'selectProductList?name=' + name;
@@ -19,6 +35,8 @@
 		location.href = 'selectProductList?name=' + name;
 	}
 </script>
+
+
 </head>
 <body>
 	{{template "header" .name}}
@@ -37,14 +55,10 @@
 				<li><a href="javascript:searchHot('肉脯')">肉脯</a></li>
 				<li><a href="javascript:searchHot('牛奶')">牛奶</a></li>
 				<li><a href="javascript:searchHot('特产')">特产</a></li>
-				<li class="last"><input type="text" id="selectname"
-					value="{{.search_words}}" /><a href="javascript:selectname()">搜索</a></li>
+				<li class="last"><input type="text" id="selectname" /><a
+					href="javascript:selectname()">搜索</a></li>
 			</ul>
 		</div>
-	</div>
-	<div id="position" class="wrap">
-		您现在的位置：<a href="indexSelect">商城</a> &gt; <a href="selectProductList">商品分类</a>
-		&gt; {{.title}}
 	</div>
 	<div id="main" class="wrap">
 		<div class="lefter">
@@ -55,9 +69,9 @@
 						<a href="selectProductList">全部商品</a>
 					</dt>
 					{{range .flist}}
-                        <dt>
-                            <a href="selectProductList?fid={{.Id}}">{{.Name}}</a>
-                        </dt>
+					    <dt>
+					        <a href="selectProductList?fid={{.Id}}">{{.Name}}</a>
+					    </dt>
                         {{$fatherCid := .Id}}
                         {{range $.clist}}
                         {{if eq $fatherCid .ParentId}}
@@ -66,7 +80,7 @@
                             </dd>
                         {{end}}
                         {{end}}
-                    {{end}}
+					{{end}}
 				</dl>
 			</div>
 			<div class="spacer"></div>
@@ -85,63 +99,42 @@
 				</dl>
 			</div>
 		</div>
+
 		<div class="main">
-			<div class="product-list">
-				<h2>{{.title}}</h2>
-				<div class="pager">
-				</div>
-				<div class="clear"></div>
-				<ul class="product clearfix">
-				    {{range .list}}
-						<li>
-							<dl>
-								<dt>
-									<a href="selectProductView?id={{.Id}}"><img
-										src="images/product/{{.FileName}}" /></a>
-								</dt>
-								<dd class="title">
-									<a href="selectProductView?id={{.Id}}">{{.Name}}</a>
-								</dd>
-								<dd class="price">￥{{.Price}}.00</dd>
-							</dl>
-						</li>
+			<div class="price-off">
+				<h2>个人订单</h2>
+				    {{if .dan}}
+                        <table border="1" width="600px" height="100px" bordercolor="red">
+                            <tr align="center">
+                                <td class="field">订单号</td>
+                                <td class="field">用户ID</td>
+                                <td class="field">商品名称</td>
+                                <td class="field">商品图片</td>
+                                <td class="field">商品价格</td>
+                                <td class="field">购买数量</td>
+                                <td class="field">商品库存</td>
+                            </tr>
+                            {{range .dan}}
+                                <tr align="center">
+                                    <td>{{.Id}}</td>
+                                    <td>{{.UserId}}</td>
+                                    <td>{{.ProdName}}</td>
+                                    <td><img src="images/product/{{.ProdFileName}}"
+                                        height="100" width="100" /></td>
+                                    <td>{{.ProdPrice}}</td>
+                                    <td>{{.Quantity}}</td>
+                                    <td>{{.ProdStock}}</td>
+                                </tr>
+                            {{end}}
+                        </table>
+				    {{else}}
+				        <a href="indexSelect">快去购买吧</a>
 				    {{end}}
-				</ul>
-				<div class="clear"></div>
-				<div class="pager">
-					<ul class="clearfix">
-						<li>当前:{{.cpage}}/{{.tpage}}页</li>
-						<li><a href="selectProductList?cp=1">首页</a></li>
-						<li>
-						    {{if le .cpage 1}}
-						        <a href="selectProductList?cp=1">上一页</a>
-						    {{else}}
-						        <a href="selectProductList?cp={{add .cpage -1}}">上一页</a>
-						    {{end}}
-						</li>
-						<li>
-						    {{$tpageReduceOne := add .tpage -1}}
-						    {{if ge .cpage $tpageReduceOne}}
-						        <a href="selectProductList?cp={{.tpage}}">下一页</a>
-						    {{else}}
-						        <a href="selectProductList?cp={{add .cpage 1}}">下一页</a>
-						    {{end}}
-						</li>
-						<li><a href="selectProductList?cp={{.tpage}}">尾页</a></li>
-						<li><select onchange="jump(this.value)">
-						    {{range $i,$v := .selectList}}
-						        {{if eq $v $.cpage}}
-						            <option selected="selected" value="{{$v}}">{{$v}}页</option>
-						        {{else}}
-						            <option value="{{$v}}">{{$v}}页</option>
-						        {{end}}
-						    {{end}}
-						</select></li>
-					</ul>
-				</div>
 			</div>
+
 		</div>
-		<div class="clear"></div>
 	</div>
 </body>
 </html>
+
+

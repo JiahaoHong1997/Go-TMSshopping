@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>后台管理-商城</title>
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<script type="text/javascript" src="/scripts/function-manage.js"></script>
+{{if not .name}}
+    <script type="text/javascript">
+		alert('请先登录');
+		location.href = "/loginPage";
+	</script>
+{{end}}
+</head>
+<body>
+    {{template "manage-header" .name}}
+	<div id="position" class="wrap">
+		您现在的位置：<a href="/indexSelect">商城</a> &gt; 管理后台
+	</div>
+	<div id="main" class="wrap">
+		<div id="menu-mng" class="lefter">
+            {{template "manage-menu-box"}}
+		</div>
+		<div class="main">
+			<h2>管理首页</h2>
+			<div id="welcome" class="manage">
+				<div class="shadow">
+					<em class="corner lb"></em> <em class="corner rt"></em>
+					<div class="box">
+						<div class="msg">
+							<p>欢迎回来</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+</body>
+</html>
